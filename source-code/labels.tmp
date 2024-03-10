@@ -1,0 +1,82 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.1.30</VERSION>
+ <DEVICE>ATmega8535</DEVICE>
+ <WORKING_DIR>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:\Program Files\Atmel\AVR Tools\AvrAssembler2\Appnotes</DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\m8535def.inc</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Macro.asm</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\serial.asm</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\hexascii.asm</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\cariperintah.asm</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.map</FILE>
+  <FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.lst</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <Start><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>30</LINE></Start>
+  <InitSerial><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\serial.asm</FILE><LINE>8</LINE></InitSerial>
+  <DeviceNumber><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>20</LINE></DeviceNumber>
+  <PerintahScanUVTRON><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>68</LINE></PerintahScanUVTRON>
+  <TungguInfoUVTRON><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>46</LINE></TungguInfoUVTRON>
+  <PerintahAktivasiKipas><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>93</LINE></PerintahAktivasiKipas>
+  <Hold><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>53</LINE></Hold>
+  <TungguSmartUVTRONSiap><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>56</LINE></TungguSmartUVTRONSiap>
+  <Buffer><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>22</LINE></Buffer>
+  <TargetType><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>26</LINE></TargetType>
+  <TargetNum><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>27</LINE></TargetNum>
+  <KirimPaketData><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>215</LINE></KirimPaketData>
+  <DeltaSubSerialInput2><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>95</LINE></DeltaSubSerialInput2>
+  <PerintahAktivasiKipasdanScan><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>118</LINE></PerintahAktivasiKipasdanScan>
+  <PerintahMIntaInfo><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>150</LINE></PerintahMIntaInfo>
+  <PerintahSetting><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>177</LINE></PerintahSetting>
+  <TabelPerintahDeltaSub><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm</FILE><LINE>205</LINE></TabelPerintahDeltaSub>
+  <InitSerialDanInterrupt><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\serial.asm</FILE><LINE>1</LINE></InitSerialDanInterrupt>
+  <Serial_In><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\serial.asm</FILE><LINE>21</LINE></Serial_In>
+  <Serial_Out><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\serial.asm</FILE><LINE>29</LINE></Serial_Out>
+  <Hex_ASCII2><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\hexascii.asm</FILE><LINE>2</LINE></Hex_ASCII2>
+  <Hex_ASCII1><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\hexascii.asm</FILE><LINE>11</LINE></Hex_ASCII1>
+  <Bukan_Angka><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\hexascii.asm</FILE><LINE>17</LINE></Bukan_Angka>
+  <Plus30><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\hexascii.asm</FILE><LINE>15</LINE></Plus30>
+  <Delay><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>1</LINE></Delay>
+  <LoopDelay><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>5</LINE></LoopDelay>
+  <Delay2><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>10</LINE></Delay2>
+  <Loop2Delay><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>14</LINE></Loop2Delay>
+  <Delay4><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>20</LINE></Delay4>
+  <Delay3><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>25</LINE></Delay3>
+  <Loop3Delay><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm</FILE><LINE>28</LINE></Loop3Delay>
+  <PanjangData><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>21</LINE></PanjangData>
+  <Checksum><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>23</LINE></Checksum>
+  <SourceNum><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>24</LINE></SourceNum>
+  <SourceType><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>25</LINE></SourceType>
+  <AddChecksum><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>30</LINE></AddChecksum>
+  <SimpankeBuffer><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>40</LINE></SimpankeBuffer>
+  <LoopBuffer><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>48</LINE></LoopBuffer>
+  <KirimACK><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>56</LINE></KirimACK>
+  <ErrorACK><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>91</LINE></ErrorACK>
+  <ChecksumACK><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>83</LINE></ChecksumACK>
+  <AbaikanDeviceID><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>200</LINE></AbaikanDeviceID>
+  <AbaikanDeviceNumber><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>203</LINE></AbaikanDeviceNumber>
+  <ErrorChecksum2><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>139</LINE></ErrorChecksum2>
+  <DeltaSubSerialInput><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>144</LINE></DeltaSubSerialInput>
+  <AbaikanSerial><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>209</LINE></AbaikanSerial>
+  <ErrorChecksum><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>194</LINE></ErrorChecksum>
+  <CariPerintah><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\cariperintah.asm</FILE><LINE>35</LINE></CariPerintah>
+  <LoopPaketData><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm</FILE><LINE>237</LINE></LoopPaketData>
+  <LoopCariPerintah><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\cariperintah.asm</FILE><LINE>36</LINE></LoopCariPerintah>
+  <PerintahTidakKetemu><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\cariperintah.asm</FILE><LINE>62</LINE></PerintahTidakKetemu>
+  <PerintahKetemu><FILE>M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\cariperintah.asm</FILE><LINE>49</LINE></PerintahKetemu>
+ </LABELS>
+</ASSEMBLER_INFO>

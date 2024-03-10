@@ -1,0 +1,704 @@
+
+AVRASM ver. 2.1.30  M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm Tue Apr 03 15:30:53 2012
+
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(4): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\m8535def.inc'
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(5): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Macro.asm'
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(208): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\serial.asm'
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(209): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\hexascii.asm'
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(210): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\delay.asm'
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(211): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\deltasub.asm'
+M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\Motorcontrol2.asm(212): Including file 'M:\CD-CD\CD Smart UVTRON Kit\Source Code\delta-smart-uv\cariperintah.asm'
+                 
+                 
+                 ;************************ EQU - DEF Definition **************************
+                 .list
+                 .listmac
+                 
+                 .DSEG			; Start data segment 
+                 .org	SRAM_Start
+                 
+                 
+                 .def	A=R16
+                 .def	B=R17
+                 
+                 
+                 
+                 .equ	STX	= $1E
+                 .equ	DeviceID	=$00
+                 
+                 ;**************************** Main Program ******************************
+                 .CSEG			; Start code segment
+                 .org     0
+                 
+                 ;Output UVTRON = PortC.6
+                 ;Busy = PortC.5
+                 
+                 ;Control = PortC.4
+                 
+                +
+000000 e5af     +ldi XL , low ( RAMEND )
+000001 e0b2     +ldi XH , high ( RAMEND )
+                 Start:	LDX	RAMEND		; X <= Stack Pointer init address to End of internal RAM
+                 	
+000002 bfad      	out 	SPL,XL		; Setup Stack Pointer Low byte
+000003 bfbe      	out 	SPH,XH		; Setup Stack Pointer High byte
+                 
+000004 e180      	Ldi		R24,Low(0b00010000)
+000005 bb84      	Out		DDRC,R24
+                 
+                 
+000006 d07a      	Rcall	InitSerial
+000007 e091      	Ldi		R25,Low($01)
+000008 9390 0060 	Sts		DeviceNumber,R25
+00000a d008      	Rcall	PerintahScanUVTRON
+                 
+                 
+                 
+                 TungguInfoUVTRON:	
+00000b 999e      	Sbic	PinC,6
+00000c cffe      	Rjmp	TungguInfoUVTRON
+                 
+00000d d018      	Rcall	PerintahAktivasiKipas
+                 
+                 
+                 Hold:
+00000e cfff      	Rjmp	Hold
+                 
+                 TungguSmartUVTRONSiap:					;Saat Busy = 1, tunggu Smart UVTRON
+00000f 99ad      	Sbic	PortC,5					;
+000010 cffe      	Rjmp	TungguSmartUVTRONSiap		;
+000011 98ac      	Cbi		PortC,4						;Enable control Smart UVTRON
+000012 9508      	Ret
+                 
+                 ;===============================================================================
+                 ; Perintah Untuk Scan UVTRON
+                 ; - Panjang data = 02
+                 ; - Jenis Perintah = 05
+                 ; - 0 = Scan non aktif, 1 = Scan aktif
+                 
+                 PerintahScanUVTRON:
+000013 dffb      	Rcall	TungguSmartUVTRONSiap
+000014 e082      	Ldi		R24,Low($02)				;Panjang data
+000015 9380 0062 	Sts		Buffer,R24					;
+000017 e085      	Ldi		R24,Low($05)				;Jenis perintah = Kendali Scan
+000018 9380 0063 	Sts		Buffer+1,R24				;
+00001a e081      	Ldi		R24,Low($01)				;Scan aktif = 1, non aktif = 0
+00001b 9380 0064 	Sts		Buffer+2,R24				;
+                 
+                 
+00001d e380      	Ldi		R24,Low($30)				;Target type = Smart UVTRON
+00001e 9380 007e 	Sts		TargetType,R24				;
+000020 e081      	Ldi		R24,Low($01)				;Target number = 01
+000021 9380 007f 	Sts		TargetNum,R24				;
+000023 d134      	Rcall	KirimPaketData				;
+000024 d0d8      	Rcall	DeltaSubSerialInput2		;Wait ACK
+000025 9508      	Ret
+                 
+                 
+                 ;===============================================================================
+                 ; Perintah Untuk Aktifkan Kipas
+                 ; - Panjang data = 02
+                 ; - Jenis Perintah = 03
+                 ; - 0 = Kipas non aktif, 1 = Kipas aktif
+                 
+                 PerintahAktivasiKipas:
+000026 dfe8      	Rcall	TungguSmartUVTRONSiap
+000027 e082      	Ldi		R24,Low($02)				;Panjang data
+000028 9380 0062 	Sts		Buffer,R24					;
+00002a e083      	Ldi		R24,Low($03)				;Jenis perintah = Kendali Kipas
+00002b 9380 0063 	Sts		Buffer+1,R24				;
+00002d e081      	Ldi		R24,Low($01)				;Kipas aktif = 1, non aktif = 0
+00002e 9380 0064 	Sts		Buffer+2,R24				;
+                 
+                 
+000030 e380      	Ldi		R24,Low($30)				;Target type = Smart UVTRON
+000031 9380 007e 	Sts		TargetType,R24				;
+000033 e081      	Ldi		R24,Low($01)				;Target number = 01
+000034 9380 007f 	Sts		TargetNum,R24				;
+000036 d121      	Rcall	KirimPaketData				;
+000037 d0c5      	Rcall	DeltaSubSerialInput2		;Wait ACK
+000038 9508      	Ret
+                 
+                 
+                 ;===============================================================================
+                 ; Perintah Untuk Aktifkan Kipas
+                 ; - Panjang data = 02
+                 ; - Jenis Perintah = 04
+                 ; - 0 = Kipas non aktif, scan non aktif, 1 = Kipas aktif scan aktif
+                 
+                 PerintahAktivasiKipasdanScan:
+000039 dfd5      	Rcall	TungguSmartUVTRONSiap
+00003a e082      	Ldi		R24,Low($02)				;Panjang data
+00003b 9380 0062 	Sts		Buffer,R24					;
+00003d e084      	Ldi		R24,Low($04)				;Jenis perintah = Kendali Kipas dan scan
+00003e 9380 0063 	Sts		Buffer+1,R24				;
+000040 e080      	Ldi		R24,Low($00)				;Kipas aktif = 1, non aktif = 0
+000041 9380 0064 	Sts		Buffer+2,R24				;
+                 
+                 
+000043 e380      	Ldi		R24,Low($30)				;Target type = Smart UVTRON
+000044 9380 007e 	Sts		TargetType,R24				;
+000046 e081      	Ldi		R24,Low($01)				;Target number = 01
+000047 9380 007f 	Sts		TargetNum,R24				;
+000049 d10e      	Rcall	KirimPaketData				;
+00004a d0b2      	Rcall	DeltaSubSerialInput2		;Wait ACK
+00004b 9508      	Ret
+                 
+                 ;===============================================================================
+                 ; Perintah Untuk Minta info
+                 ; - Panjang data = 01
+                 ; - Jenis Perintah = 02
+                 ; - Ambil balasan setelah ACK
+                 
+                 ; Hasil:
+                 ; - Data Durasi gerak di Buffer+2
+                 ; - Data Nilai Setting Api di Buffer+3
+                 ; - Data Nilai Api Hilang di Buffer+4
+                 ; - Data Nilai Api Ketemu di Buffer+5
+                 ; - Data Intensitas api di Buffer+6
+                 ; - Data Posisi sudut di buffer+7
+                 
+                 PerintahMIntaInfo:
+00004c dfc2      	Rcall	TungguSmartUVTRONSiap
+00004d e081      	Ldi		R24,Low($01)				;Panjang data
+00004e 9380 0062 	Sts		Buffer,R24					;
+000050 e082      	Ldi		R24,Low($02)				;Jenis perintah = Minta Info
+000051 9380 0063 	Sts		Buffer+1,R24				;
+                 
+000053 e380      	Ldi		R24,Low($30)				;Target type = Smart UVTRON
+000054 9380 007e 	Sts		TargetType,R24				;
+000056 e081      	Ldi		R24,Low($01)				;Target number = 01
+000057 9380 007f 	Sts		TargetNum,R24				;
+000059 d0fe      	Rcall	KirimPaketData				;
+00005a d0a2      	Rcall	DeltaSubSerialInput2		;Wait ACK
+00005b d0a1      	Rcall	DeltaSubSerialInput2		;Ambil balasan
+00005c 9508      	Ret
+                 
+                 ;===============================================================================
+                 ; Perintah Untuk Setting Smart UVTRON
+                 ; - Panjang data = 08
+                 ; - Jenis Perintah = 01
+                 ; - Buffer+2 = Durasi Gerakan Servo (default 80h) silahkan diubah sesuai kebutuhan dg ref dari manual
+                 ; - Buffer+3 = Nilai Setting Api (default 08) silahkan diubah sesuai kebutuhan dg ref dari manual
+                 ; - Buffer+4 = Nilai Api dianggap Hilang (default 03) silahkan diubah sesuai kebutuhan dg ref dari manual
+                 ; - Buffer+5 = Nilai Api dianggap Ketemu (default 03) silahkan diubah sesuai kebutuhan dg ref dari manual
+                 ; - Buffer+6 = Aktivasi kipas saat api ketemu, (00 = tidak aktif, 01=langsung aktif) silahkan diubah sesuai kebutuhan dg ref dari manual
+                 
+                 
+                 PerintahSetting:
+00005d dfb1      	Rcall	TungguSmartUVTRONSiap
+00005e e081      	Ldi		R24,Low($01)				;Panjang data
+00005f 9380 0062 	Sts		Buffer,R24					;
+000061 e082      	Ldi		R24,Low($02)				;Jenis perintah = Minta Info
+000062 9380 0063 	Sts		Buffer+1,R24				;
+000064 e880      	Ldi		R24,Low($80)				;Durasi gerak = 80h
+000065 9380 0064 	Sts		Buffer+2,R24				;
+000067 e088      	Ldi		R24,Low($08)				;Nilai Setting api = 08
+000068 9380 0065 	Sts		Buffer+3,R24				;
+00006a e083      	Ldi		R24,Low($03)				;Nilai Api dianggap hilang = 03
+00006b 9380 0066 	Sts		Buffer+4,R24				;
+00006d e083      	Ldi		R24,Low($03)				;Nilai Api dianggap ketemu = 03
+00006e 9380 0067 	Sts		Buffer+5,R24				;
+000070 e081      	Ldi		R24,Low($01)				;Aktifkan kipas saat api ketemu
+000071 9380 0068 	Sts		Buffer+6,R24				;
+                 
+                 
+000073 e380      	Ldi		R24,Low($30)				;Target type = Smart UVTRON
+000074 9380 007e 	Sts		TargetType,R24				;
+000076 e081      	Ldi		R24,Low($01)				;Target number = 01
+000077 9380 007f 	Sts		TargetNum,R24				;
+000079 d0de      	Rcall	KirimPaketData				;
+00007a d082      	Rcall	DeltaSubSerialInput2		;Wait ACK
+00007b 9508      	Ret
+                 
+                 
+                 
+                 TabelPerintahDeltaSub:
+                 
+                 
+                 .include "serial.asm"
+                 
+00007c e998      	LDI  	R25,LOW(0x98)	//RX & TX Enable, Serial Interrupt Disable
+00007d b99a      	OUT  	UCSRB,R25		//
+00007e e393      	LDI  	R25,LOW(0x33)	//Baudrate 9600 (Crystal 8 MHz)
+00007f b999      	OUT  	UBRRL,R25	
+000080 9508      	Ret
+                 
+                 InitSerial:
+000081 e198      	LDI  	R25,LOW(0x18)	//RX & TX Enable, Serial Interrupt Disable
+000082 b99a      	OUT  	UCSRB,R25		//
+000083 e098      	LDI  	R25,LOW(0x8)	//Baudrate 57600 (Crystal 8 MHz)
+000084 b999      	OUT  	UBRRL,R25	
+000085 9888      	Cbi		DDRD,0
+000086 9889      	Cbi		DDRD,1
+000087 9a90      	SBi		PortD,0
+000088 9a91      	Sbi		PortD,1
+000089 9508      	Ret
+                 
+                 
+                 
+                 Serial_In:
+00008a 9b5f           Sbis UCSRA,RXC		//skip ke perintah selanjutnya bila rxc set
+00008b cffe           Rjmp Serial_In
+00008c b19c           In   R25,UDR
+00008d 0000      	Nop
+00008e 0000      	Nop
+00008f 0000      	Nop
+000090 9508      	RET
+                 Serial_Out:
+000091 9b5d           Sbis UCSRA,UDRE	//skip ke perintah selanjutnya bila USR set
+000092 cffe           Rjmp Serial_Out
+000093 b99c           Out  UDR,R25
+000094 9888      	Cbi		DDRD,0
+000095 9889      	Cbi		DDRD,1
+000096 9a90      	SBi		PortD,0
+000097 9a91      	Sbi		PortD,1
+                 
+000098 9508      	RET	
+                 .include "hexascii.asm"
+                 
+                 Hex_ASCII2:
+000099 930f      	push	A		;Simpan Reg A ke Stack
+00009a d005      	rcall	Hex_ASCII1	;Konversi 1 nibble
+00009b 2f10      	mov	B,A		;Simpan nibble bawah di Reg B
+00009c 910f      	pop	A		;Ambil Reg A dari Stack
+00009d 9502      	swap	A		;Tukar
+00009e d001      	rcall	Hex_ASCII1	;Konversi 1 nibble
+00009f 9508      	ret
+                 
+                 Hex_ASCII1:
+0000a0 700f      	andi	A,$F		;Hapus Nibble Atas
+0000a1 300a      	cpi	A,10
+0000a2 f414      	brge	Bukan_Angka	;Reg A >=10  bukan angka 
+                +
+0000a3 5d00     +subi A , - $30
+                 Plus30:	ADDI	A,$30		;Reg A < tambah $30
+0000a4 9508      	Ret
+                 Bukan_Angka:
+                +
+0000a5 5c09     +subi A , - $37
+                 	ADDI	A,$37
+0000a6 9508      	ret
+                 	
+                 .include "delay.asm"
+                 
+0000a7 936f      	Push	R22
+0000a8 e460      	Ldi		R22,Low($40)
+                 ;	Ldi		R22,High($01)
+                 LoopDelay:
+                +
+0000a9 956a     +dec R22
+0000aa f7f1     +brne LoopDelay
+                 	Djnz	R22,LoopDelay
+0000ab 916f      	Pop		R22
+0000ac 9508      	Ret
+                 
+                 Delay2:
+0000ad 936f      	Push	R22
+0000ae e061      	Ldi		R22,Low($01)
+0000af e060      	Ldi		R22,High($01)
+                 Loop2Delay:
+0000b0 dff6      	Rcall	Delay
+                +
+0000b1 956a     +dec R22
+0000b2 f7e9     +brne Loop2Delay
+                 	Djnz	R22,Loop2Delay
+0000b3 916f      	Pop		R22
+0000b4 9508      	Ret
+                 
+                 Delay4:
+0000b5 dff7      	Rcall	Delay2
+0000b6 dff6      	Rcall	Delay2
+0000b7 9508      	Ret
+                 
+                 Delay3:
+0000b8 936f      	Push	R22
+0000b9 e460      	Ldi		R22,Low($40)
+                 Loop3Delay:
+0000ba dff2      	Rcall	Delay2
+                +
+0000bb 956a     +dec R22
+0000bc f7e9     +brne Loop3Delay
+                 	Djnz	R22,Loop3Delay
+0000bd 916f      	Pop		R22
+0000be 9508      	Ret
+                 .include "deltasub.asm"
+                 
+                 ;File cariperintah.asm harus diincludekan di main program
+                 ;Fungsi subroutine:
+                 ;- Delta SubSerialInput:
+                 ;  * Mengambil data serial sesuai protokol Delta Subsystem
+                 ;  * Membalas ACK sesuai checksum
+                 ;  * Proses Perintah bila ACK OK
+                 ;  * Abaikan perintah bila ACK tidak OK
+                 ;- KirimPaketData
+                 ;  * Mengirim paket data dari buffer dalam protokol Delta Sub System
+                 ;  * Tentukan panjang paket (variabel buffer)
+                 ;  * Isi buffer
+                 ;  * Tentukan Target Type dan Target Num, bila paket data adalah balasan perintah maka
+                 ;    pindahkan source type ke target type dan source num ke target num
+                 ;  * Panggil subroutine kirimpaketdata
+                 
+                 
+                 .DSEG
+                 
+000060           DeviceNumber:	.Byte 1
+000061           PanjangData:	.Byte 1
+000062           Buffer:			.Byte 25
+00007b           Checksum:		.Byte 1
+00007c           SourceNum:		.Byte 1
+00007d           SourceType:		.Byte 1
+00007e           TargetType:		.Byte 1
+00007f           TargetNum:		.Byte 1
+                 
+                 .CSEG
+                 AddChecksum:
+0000bf 939f      	Push	R25
+0000c0 938f      	Push	R24
+0000c1 9180 007b 	Lds		R24,Checksum
+0000c3 0f98      	Add		R25,R24
+0000c4 9390 007b 	Sts		Checksum,R25
+0000c6 918f      	Pop		R24
+0000c7 919f      	Pop		R25
+0000c8 9508      	Ret
+                 
+                 SimpankeBuffer:
+0000c9 9390 0061 	Sts		PanjangData,R25		//
+                 
+0000cb e6a2      	LDI		R26,LOW(Buffer)		//Siapkan alamat buffer
+0000cc e0b0      	LDI		R27,HIGH(Buffer)	//
+0000cd 9180 0061 	Lds		R24,PanjangData		//
+0000cf 939d      	St		X+,R25
+                 
+                 LoopBuffer:	
+0000d0 dfb9      	Rcall	Serial_In			//
+0000d1 939d      	St		X+,R25
+0000d2 dfec      	Rcall	AddChecksum
+0000d3 2f98      	Mov		R25,R24
+                +
+0000d4 958a     +dec R24
+0000d5 f7d1     +brne LoopBuffer
+                 	Djnz	R24,LoopBuffer
+0000d6 9508      	Ret
+                 
+                 KirimACK:
+0000d7 b77f      	In		R23,SREG
+0000d8 e19e      	Ldi		R25,STX
+0000d9 dfb7      	Rcall	Serial_Out
+0000da 9390 007b 	Sts		Checksum,R25
+0000dc 9190 007d 	Lds		R25,SourceType
+0000de dfb2      	Rcall	Serial_Out
+0000df dfdf      	Rcall	AddChecksum
+0000e0 9190 007c 	Lds		R25,SourceNum
+0000e2 dfae      	Rcall	Serial_Out
+0000e3 dfdb      	Rcall	AddChecksum
+0000e4 e090      	Ldi		R25,DeviceID
+0000e5 dfab      	Rcall	Serial_Out
+0000e6 dfd8      	Rcall	AddChecksum
+0000e7 9190 0060 	Lds		R25,DeviceNumber
+0000e9 dfa7      	Rcall	Serial_Out
+0000ea dfd4      	Rcall	AddChecksum
+0000eb e092      	Ldi		R25,Low(02)
+0000ec dfa4      	Rcall	Serial_Out
+0000ed dfd1      	Rcall	AddChecksum
+0000ee e096      	Ldi		R25,Low(06)
+0000ef dfa1      	Rcall	Serial_Out
+0000f0 dfce      	Rcall	AddChecksum
+0000f1 bf7f      	Out		SREG,R23
+0000f2 f040      	Brcs	ErrorACK
+0000f3 e49f      	Ldi		R25,Low('O')
+                 
+                 ChecksumACK:
+0000f4 df9c      	Rcall	Serial_out
+0000f5 dfc9      	Rcall	AddChecksum
+0000f6 9190 007b 	Lds		R25,Checksum
+0000f8 9591      	Neg		R25
+0000f9 df97      	Rcall	Serial_Out
+0000fa 9508      	Ret
+                 
+                 ErrorACK:
+0000fb e495      	Ldi		R25,Low('E')
+0000fc cff7      	Rjmp	ChecksumACK
+                 
+                 DeltaSubSerialInput2:
+0000fd df8c      	Rcall	Serial_In
+0000fe e18e      	Ldi		R24,Low(STX)
+0000ff 9380 007b 	Sts		Checksum,R24
+000101 1389      	Cpse	R24,R25
+000102 cffa      	Rjmp	DeltaSubSerialInput2
+000103 df86      	Rcall	Serial_In
+                 
+                 
+000104 dfba      	Rcall	AddChecksum
+000105 e080      	Ldi		R24,Low(DeviceID)	//
+000106 1389      	Cpse	R24,R25				//
+000107 c04a      	Rjmp	AbaikanDeviceID		//Bila tidak sama abaikan
+                 
+000108 df81      	Rcall	Serial_In			//Ambil Device number
+000109 dfb5      	Rcall	AddChecksum
+00010a 9180 0060 	Lds		R24,DeviceNumber	//
+00010c 1389      	CPSE	R24,R25				//
+00010d c045      	Rjmp	AbaikanDeviceNumber		//Bila tidak sama abaikan
+                 
+00010e df7b      	Rcall	Serial_In			//Ambil ID pengirim
+                 
+                 
+                 
+00010f 9390 007d 	Sts		SourceType,R25
+000111 dfad      	Rcall	AddChecksum
+                 
+000112 df77      	Rcall	Serial_In			//Ambil nomor urut pengirim
+                 
+                 
+000113 9390 007c 	Sts		SourceNum,R25
+000115 dfa9      	Rcall	AddChecksum
+                 
+000116 df73      	Rcall	Serial_In			//Ambil panjang data
+000117 dfa7      	Rcall	AddChecksum
+000118 dfb0      	Rcall	SimpankeBuffer
+                 
+000119 9180 007b 	Lds		R24,Checksum
+00011b 9581      	Neg		R24
+00011c df6d      	Rcall	Serial_In
+00011d 1389      	Cpse	R24,R25
+00011e c002      	Rjmp	ErrorChecksum2
+00011f 9488      	Clc	
+000120 9508      	Ret
+                 ErrorChecksum2:
+000121 9408      	SEC
+000122 9508      	Ret
+                 
+                 
+                 DeltaSubSerialInput:
+000123 b19c          In   	R25,UDR				//Ambil data serial
+000124 e18e      	Ldi		R24,Low(STX)		//Apakah sama dengan STX?
+000125 9380 007b 	Sts		Checksum,R24
+000127 1389      	CPSE	R24,R25				//
+000128 c02e      	Rjmp	AbaikanSerial		//Bila tidak abaikan
+                 
+000129 df60      	Rcall	Serial_In			//Ambil device ID
+00012a df94      	Rcall	AddChecksum
+                 
+00012b e080      	Ldi		R24,Low(DeviceID)	//
+00012c 1389      	CPSE	R24,R25				//
+00012d c024      	Rjmp	AbaikanDeviceID		//Bila tidak sama abaikan
+                 
+00012e df5b      	Rcall	Serial_In			//Ambil Device number
+00012f df8f      	Rcall	AddChecksum
+000130 9180 0060 	Lds		R24,DeviceNumber	//
+000132 1389      	CPSE	R24,R25				//
+000133 c01f      	Rjmp	AbaikanDeviceNumber		//Bila tidak sama abaikan
+                 
+000134 df55      	Rcall	Serial_In			//Ambil ID pengirim
+000135 9390 007d 	Sts		SourceType,R25
+000137 df87      	Rcall	AddChecksum
+                 
+000138 df51      	Rcall	Serial_In			//Ambil nomor urut pengirim
+000139 9390 007c 	Sts		SourceNum,R25
+00013b df83      	Rcall	AddChecksum
+                 
+00013c df4d      	Rcall	Serial_In			//Ambil panjang data
+00013d df81      	Rcall	AddChecksum
+00013e df8a      	Rcall	SimpankeBuffer
+                 
+00013f 9180 007b 	Lds		R24,Checksum
+000141 9581      	Neg		R24
+000142 df47      	Rcall	Serial_In
+000143 1389      	Cpse	R24,R25
+000144 c00a      	Rjmp	ErrorChecksum
+000145 9488      	Clc	
+                 
+000146 df90      	Rcall	KirimACK
+000147 bf7f      	Out		SREG,R23	
+000148 f070      	Brcs	AbaikanSerial
+                +
+000149 efe8     +ldi ZL , low ( TabelPerintahDeltaSub * 2 )
+00014a e0f0     +ldi ZH , high ( TabelPerintahDeltaSub * 2 )
+                 	Ldz		TabelPerintahDeltaSub*2
+00014b 9190 0063 	Lds		R25,Buffer+1
+00014d d02e      	Rcall	CariPerintah
+                 
+00014e 9508      	Ret
+                 
+                 
+                 
+                 ErrorChecksum:
+00014f 9408      	Sec
+000150 df86      	Rcall	KirimACK
+000151 9508      	Ret
+                 
+                 
+                 AbaikanDeviceID:
+000152 df37      	Rcall	Serial_In		//Buang Device Number
+                 
+                 AbaikanDeviceNumber:
+000153 df36      	Rcall	Serial_In		//Buang Source Type
+000154 df35      	Rcall	Serial_In		//Buang Source Number
+000155 df73      	Rcall	SimpankeBuffer	
+000156 df33      	Rcall	Serial_In		//Buang Checksum
+                 
+                 AbaikanSerial:
+000157 9508      	Ret
+                 
+                 
+                 
+                 
+                 KirimPaketData:
+000158 e19e      	Ldi		R25,Low(STX)			;Kirim STX
+000159 9390 007b 	Sts		Checksum,R25			;
+00015b df35      	Rcall	Serial_out				;
+                 
+00015c 9190 007e 	Lds		R25,TargetType		;Kirim Device ID
+00015e df32      	Rcall	Serial_Out				;
+00015f df5f      	Rcall	AddChecksum				;
+000160 9190 007f 	Lds		R25,TargetNum		;Kirim Device Number
+000162 df2e      	Rcall	Serial_Out				;
+000163 df5b      	Rcall	AddChecksum				;
+000164 e090      	Ldi		R25,Low(DeviceID)			;Kirim Target Type
+000165 df2b      	Rcall	Serial_Out				;
+000166 df58      	Rcall	AddChecksum				;
+000167 9190 0060 	Lds		R25,DeviceNumber			;Kirim Target Num
+000169 df27      	Rcall	Serial_Out				;
+00016a df54      	Rcall	AddChecksum				;
+00016b 9190 0062 	Lds		R25,Buffer				;Kirim Buffer
+00016d df23      	Rcall	Serial_Out				;
+00016e df50      	Rcall	AddChecksum				;
+00016f 2f89      	Mov		R24,R25					;
+                +
+000170 e6a3     +ldi XL , low ( Buffer + 1 )
+000171 e0b0     +ldi XH , high ( Buffer + 1 )
+                 	Ldx		Buffer+1					;
+                 LoopPaketData:
+000172 919d      	Ld		R25,X+					;Kirim isi buffer
+000173 df1d      	Rcall	Serial_Out				;
+000174 df4a      	Rcall	AddChecksum				;
+                +
+000175 958a     +dec R24
+000176 f7d9     +brne LoopPaketData
+                 	Djnz	R24,LoopPaketData		;
+000177 9190 007b 	Lds		R25,Checksum
+000179 9591      	Neg		R25
+00017a df16      	Rcall	Serial_Out
+00017b 9508      	Ret
+                 .include "cariperintah.asm"
+                 
+                 
+                 ;Rutin untuk menerima parameter perintah dari input di R25 dan mengerjaka
+                 ;perintah tersebut ke label-label tertentu
+                 ;Input perintah di R25
+                 ;Tabel di Register Z
+                 ;Hasil Carry Flag set bila perintah tidak ditemukan
+                 
+                 ;Cara penggunaan:
+                 ;- Buat tabel dengan formasi
+                 ;Tabel:
+                 ;	.DB	Perintah1
+                 ;	.DW	Label1
+                 ;	.DB	Perintah2
+                 ;	.DW	Label2
+                 ;	.DB	0
+                 ;- Tuliskan program untuk perintah 1 di label1 dan perintah 2 di label 2
+                 ;Label1:
+                 ;	........
+                 ;	.........
+                 ;	Clc
+                 ;	Ret
+                 ;
+                 ;Label2:
+                 ;	.........
+                 ;	.........
+                 ;	Clc
+                 ;	Ret
+                 ;- Arahkan Register Z ke tabel x 2 sbb:
+                 ;- LDZ	Tabel*2
+                 ;- Rcall	CariPerintah
+                 
+                 
+                 .CSEG
+                 CariPerintah:
+                 LoopCariPerintah:
+00017c 95c8      	Lpm		
+00017d 2d80      	Mov		R24,R0
+                 
+                 
+                +
+00017e 2000     +tst R0
+00017f f071     +breq PerintahTidakKetemu
+                 	Jz		R0,PerintahTidakKetemu
+000180 1789      	CP		R24,R25
+000181 f011      	Breq	PerintahKetemu
+                 
+                 
+000182 9634      	Adiw	ZH:ZL,4
+000183 cff8      	Rjmp	LoopCariPerintah
+                 
+                 PerintahKetemu:
+000184 9631      	Adiw	ZH:ZL,1
+000185 9631      	Adiw	ZH:ZL,1
+000186 95c8      	Lpm
+000187 2d70      	Mov		R23,R0
+000188 9631      	Adiw	ZH:ZL,1
+000189 95c8      	Lpm
+00018a 2d80      	Mov		R24,R0
+                 
+00018b 2fe7      	Mov		ZL,R23
+00018c 2ff8      	Mov		ZH,R24
+00018d 9509      	ICall
+                 
+                 PerintahTidakKetemu:
+00018e 9408      	SEC
+00018f 9508      	Ret
+
+
+RESOURCE USE INFORMATION
+------------------------
+
+Notice:
+The register and instruction counts are symbol table hit counts,
+and hence implicitly used resources are not counted, eg, the
+'lpm' instruction without operands implicitly uses r0 and z,
+none of which are counted.
+
+x,y,z are separate entities in the symbol table and are
+counted separately from r26..r31 here.
+
+.dseg memory usage only counts static data declared with .byte
+
+ATmega8535 register use summary:
+r0 :   4 r1 :   0 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
+r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
+r16:   8 r17:   1 r18:   0 r19:   0 r20:   0 r21:   0 r22:  13 r23:   5 
+r24:  91 r25:  58 r26:   4 r27:   4 r28:   0 r29:   0 r30:   6 r31:   6 
+x  :   3 y  :   0 z  :   0 
+Registers used: 12 out of 35 (34.3%)
+
+ATmega8535 instruction use summary:
+.lds  :   0 .sts  :   0 adc   :   0 add   :   1 adiw  :   4 and   :   0 
+andi  :   1 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
+brcc  :   0 brcs  :   2 breq  :   2 brge  :   1 brhc  :   0 brhs  :   0 
+brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 brne  :   5 
+brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 brvs  :   0 
+bset  :   0 bst   :   0 cbi   :   5 cbr   :   0 clc   :   2 clh   :   0 
+cli   :   0 cln   :   0 clr   :   0 cls   :   0 clt   :   0 clv   :   0 
+clz   :   0 com   :   0 cp    :   1 cpc   :   0 cpi   :   1 cpse  :   8 
+dec   :   5 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   1 
+ijmp  :   0 in    :   3 inc   :   0 ld    :   1 ldd   :   0 ldi   :  58 
+lds   :  16 lpm   :   9 lsl   :   0 lsr   :   0 mov   :   8 movw  :   0 
+mul   :   0 muls  :   0 mulsu :   0 neg   :   4 nop   :   3 or    :   0 
+ori   :   0 out   :  10 pop   :   6 push  :   6 rcall :  90 ret   :  27 
+reti  :   0 rjmp  :  15 rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 
+sbi   :   4 sbic  :   2 sbis  :   2 sbiw  :   0 sbr   :   0 sbrc  :   0 
+sbrs  :   0 sec   :   3 seh   :   0 sei   :   0 sen   :   0 ser   :   0 
+ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 spm   :   0 
+st    :   2 std   :   0 sts   :  39 sub   :   0 subi  :   2 swap  :   1 
+tst   :   1 wdr   :   0 
+Instructions used: 37 out of 110 (33.6%)
+
+ATmega8535 memory use summary [bytes]:
+Segment   Begin    End      Code   Data   Used    Size   Use%
+---------------------------------------------------------------
+[.cseg] 0x000000 0x000320    800      0    800    8192   9.8%
+[.dseg] 0x000060 0x000080      0     32     32     512   6.3%
+[.eseg] 0x000000 0x000000      0      0      0     512   0.0%
+
+Assembly complete, 0 errors, 0 warnings
